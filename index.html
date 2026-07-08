@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CorePay Implementation Checklist & Excel Generator</title>
+    <title>CorePay Implementation Checklist</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
@@ -12,8 +12,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    <!-- SheetJS (XLSX) Library for client-side Excel compilation -->
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
     <script>
         tailwind.config = {
@@ -51,12 +49,6 @@
             -ms-overflow-style: none;
             scrollbar-width: none;
         }
-        /* Custom styles for active categories */
-        .active-tab {
-            background-color: rgba(20, 184, 166, 0.15);
-            border-color: #14b8a6;
-            color: #14b8a6;
-        }
     </style>
 </head>
 <body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans min-h-screen flex flex-col transition-colors duration-300 selection:bg-brand-500 selection:text-slate-900">
@@ -65,7 +57,7 @@
     <header class="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-6 py-4 flex flex-col sm:flex-row items-center justify-between sticky top-0 z-50 gap-4 transition-colors duration-300">
         <div class="flex items-center gap-3">
             <div class="bg-white p-1.5 rounded-lg shadow-sm border border-slate-200 dark:border-slate-800 flex items-center justify-center">
-                <img src="Screenshot 2025-02-12 at 15.12.16.png" alt="CorePay Logo" class="h-9 object-contain" onerror="this.src='https://placehold.co/160x50/ffffff/1e40af?text=CorePay'">
+                <img src="logo.png" alt="CorePay Logo" class="h-9 object-contain" onerror="this.src='https://placehold.co/160x50/ffffff/1e40af?text=CorePay'">
             </div>
         </div>
 
@@ -114,7 +106,7 @@
                         <p class="text-[10px] text-slate-500 uppercase tracking-widest font-semibold mt-1">Completed Items</p>
                     </div>
                     <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800/80 text-center">
-                        <span id="metricTotal" class="text-xl font-bold font-mono text-slate-300">114</span>
+                        <span id="metricTotal" class="text-xl font-bold font-mono text-slate-300">112</span>
                         <p class="text-[10px] text-slate-500 uppercase tracking-widest font-semibold mt-1">Total Tasks</p>
                     </div>
                 </div>
@@ -225,152 +217,152 @@
 
     <!-- Page Footer -->
     <footer class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 py-6 text-center text-xs text-slate-400 mt-12">
-        <p>© 2026 CorePay AI System Setup & Integrations Companion. Complies with Global SOC2 Trust standards.</p>
+        <p>© 2026 CorePay AI System Setup Companion. Complies with Global SOC2 Trust standards.</p>
     </footer>
 
     <script>
-        // Core Checklist Dataset matching raw modules (Company Information and Integrations modules removed)
+        // Core Checklist Dataset re-indexed sequentially from 1 to 10
         const rawChecklistData = [
-            // 2. Payroll Module
-            { id: 9, category: "2. Payroll Module", subCategory: "Employee Information", label: "Employee Master List", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 10, category: "2. Payroll Module", subCategory: "Employee Information", label: "Employee Numbers", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 11, category: "2. Payroll Module", subCategory: "Employee Information", label: "National IDs/Passport Numbers", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 12, category: "2. Payroll Module", subCategory: "Employee Information", label: "Tax Numbers", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 13, category: "2. Payroll Module", subCategory: "Employee Information", label: "NSSA/Social Security Numbers", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 14, category: "2. Payroll Module", subCategory: "Employee Information", label: "Bank Details", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 15, category: "2. Payroll Module", subCategory: "Employee Information", label: "Salary Details", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 16, category: "2. Payroll Module", subCategory: "Employee Information", label: "Employment Dates", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 17, category: "2. Payroll Module", subCategory: "Employee Information", label: "Employment Status", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 18, category: "2. Payroll Module", subCategory: "Employee Information", label: "Contract Types", requirement: "Yes", status: "Pending", notes: "" },
+            // 1. Payroll Module
+            { id: 1, category: "1. Payroll Module", subCategory: "Employee Information", label: "Employee Master List", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 2, category: "1. Payroll Module", subCategory: "Employee Information", label: "Employee Numbers", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 3, category: "1. Payroll Module", subCategory: "Employee Information", label: "National IDs/Passport Numbers", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 4, category: "1. Payroll Module", subCategory: "Employee Information", label: "Tax Numbers", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 5, category: "1. Payroll Module", subCategory: "Employee Information", label: "NSSA/Social Security Numbers", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 6, category: "1. Payroll Module", subCategory: "Employee Information", label: "Bank Details", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 7, category: "1. Payroll Module", subCategory: "Employee Information", label: "Salary Details", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 8, category: "1. Payroll Module", subCategory: "Employee Information", label: "Employment Dates", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 9, category: "1. Payroll Module", subCategory: "Employee Information", label: "Employment Status", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 10, category: "1. Payroll Module", subCategory: "Employee Information", label: "Contract Types", requirement: "Yes", status: "Pending", notes: "" },
 
-            { id: 19, category: "2. Payroll Module", subCategory: "Payroll Setup", label: "Earnings & Allowance Structure", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 20, category: "2. Payroll Module", subCategory: "Payroll Setup", label: "Deduction Codes", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 21, category: "2. Payroll Module", subCategory: "Payroll Setup", label: "Tax Tables", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 22, category: "2. Payroll Module", subCategory: "Payroll Setup", label: "Pension Rules", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 23, category: "2. Payroll Module", subCategory: "Payroll Setup", label: "Medical Aid Rules", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 24, category: "2. Payroll Module", subCategory: "Payroll Setup", label: "Loan Deductions", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 25, category: "2. Payroll Module", subCategory: "Payroll Setup", label: "Overtime Rules", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 26, category: "2. Payroll Module", subCategory: "Payroll Setup", label: "Shift Allowances", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 27, category: "2. Payroll Module", subCategory: "Payroll Setup", label: "Payroll Calendar", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 28, category: "2. Payroll Module", subCategory: "Payroll Setup", label: "Pay Frequencies", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 29, category: "2. Payroll Module", subCategory: "Payroll Setup", label: "Public Holidays", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 11, category: "1. Payroll Module", subCategory: "Payroll Setup", label: "Earnings & Allowance Structure", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 12, category: "1. Payroll Module", subCategory: "Payroll Setup", label: "Deduction Codes", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 13, category: "1. Payroll Module", subCategory: "Payroll Setup", label: "Tax Tables", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 14, category: "1. Payroll Module", subCategory: "Payroll Setup", label: "Pension Rules", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 15, category: "1. Payroll Module", subCategory: "Payroll Setup", label: "Medical Aid Rules", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 16, category: "1. Payroll Module", subCategory: "Payroll Setup", label: "Loan Deductions", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 17, category: "1. Payroll Module", subCategory: "Payroll Setup", label: "Overtime Rules", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 18, category: "1. Payroll Module", subCategory: "Payroll Setup", label: "Shift Allowances", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 19, category: "1. Payroll Module", subCategory: "Payroll Setup", label: "Payroll Calendar", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 20, category: "1. Payroll Module", subCategory: "Payroll Setup", label: "Pay Frequencies", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 21, category: "1. Payroll Module", subCategory: "Payroll Setup", label: "Public Holidays", requirement: "Yes", status: "Pending", notes: "" },
 
-            { id: 30, category: "2. Payroll Module", subCategory: "Payroll Documents", label: "Latest Payslip", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 31, category: "2. Payroll Module", subCategory: "Payroll Documents", label: "Previous Payroll Reports", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 32, category: "2. Payroll Module", subCategory: "Payroll Documents", label: "Current Payroll Input Template", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 33, category: "2. Payroll Module", subCategory: "Payroll Documents", label: "Payroll Policies", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 34, category: "2. Payroll Module", subCategory: "Payroll Documents", label: "Tax Registration Certificate", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 22, category: "1. Payroll Module", subCategory: "Payroll Documents", label: "Latest Payslip", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 23, category: "1. Payroll Module", subCategory: "Payroll Documents", label: "Previous Payroll Reports", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 24, category: "1. Payroll Module", subCategory: "Payroll Documents", label: "Current Payroll Input Template", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 25, category: "1. Payroll Module", subCategory: "Payroll Documents", label: "Payroll Policies", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 26, category: "1. Payroll Module", subCategory: "Payroll Documents", label: "Tax Registration Certificate", requirement: "Yes", status: "Pending", notes: "" },
 
-            // 3. HR Module
-            { id: 35, category: "3. HR Module", subCategory: "Required Information", label: "Employee Personal Details", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 36, category: "3. HR Module", subCategory: "Required Information", label: "Emergency Contacts", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 37, category: "3. HR Module", subCategory: "Required Information", label: "Qualifications", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 38, category: "3. HR Module", subCategory: "Required Information", label: "Employment Contracts", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 39, category: "3. HR Module", subCategory: "Required Information", label: "Employee Photos", requirement: "Optional", status: "Pending", notes: "" },
-            { id: 40, category: "3. HR Module", subCategory: "Required Information", label: "Next of Kin Information", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 41, category: "3. HR Module", subCategory: "Required Information", label: "Reporting Structure", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 42, category: "3. HR Module", subCategory: "Required Information", label: "Departments", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 43, category: "3. HR Module", subCategory: "Required Information", label: "Positions", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 44, category: "3. HR Module", subCategory: "Required Information", label: "Branch Allocation", requirement: "Yes", status: "Pending", notes: "" },
+            // 2. HR Module
+            { id: 27, category: "2. HR Module", subCategory: "Required Information", label: "Employee Personal Details", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 28, category: "2. HR Module", subCategory: "Required Information", label: "Emergency Contacts", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 29, category: "2. HR Module", subCategory: "Required Information", label: "Qualifications", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 30, category: "2. HR Module", subCategory: "Required Information", label: "Employment Contracts", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 31, category: "2. HR Module", subCategory: "Required Information", label: "Employee Photos", requirement: "Optional", status: "Pending", notes: "" },
+            { id: 32, category: "2. HR Module", subCategory: "Required Information", label: "Next of Kin Information", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 33, category: "2. HR Module", subCategory: "Required Information", label: "Reporting Structure", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 34, category: "2. HR Module", subCategory: "Required Information", label: "Departments", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 35, category: "2. HR Module", subCategory: "Required Information", label: "Positions", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 36, category: "2. HR Module", subCategory: "Required Information", label: "Branch Allocation", requirement: "Yes", status: "Pending", notes: "" },
 
-            { id: 45, category: "3. HR Module", subCategory: "HR Documents", label: "HR Policies", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 46, category: "3. HR Module", subCategory: "HR Documents", label: "Employee Handbook", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 47, category: "3. HR Module", subCategory: "HR Documents", label: "Employment Contracts Reference", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 48, category: "3. HR Module", subCategory: "HR Documents", label: "Organizational Chart", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 49, category: "3. HR Module", subCategory: "HR Documents", label: "Code of Conduct", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 37, category: "2. HR Module", subCategory: "HR Documents", label: "HR Policies", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 38, category: "2. HR Module", subCategory: "HR Documents", label: "Employee Handbook", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 39, category: "2. HR Module", subCategory: "HR Documents", label: "Employment Contracts Reference", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 40, category: "2. HR Module", subCategory: "HR Documents", label: "Organizational Chart", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 41, category: "2. HR Module", subCategory: "HR Documents", label: "Code of Conduct", requirement: "Yes", status: "Pending", notes: "" },
 
-            // 4. Leave Module
-            { id: 50, category: "4. Leave Module", subCategory: "Required Information", label: "Leave Types", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 51, category: "4. Leave Module", subCategory: "Required Information", label: "Leave Policies", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 52, category: "4. Leave Module", subCategory: "Required Information", label: "Leave Approval Workflow", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 53, category: "4. Leave Module", subCategory: "Required Information", label: "Leave Accrual Rules", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 54, category: "4. Leave Module", subCategory: "Required Information", label: "Existing Leave Balances", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 55, category: "4. Leave Module", subCategory: "Required Information", label: "Public Holiday Calendar", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 56, category: "4. Leave Module", subCategory: "Required Information", label: "Weekend Definition", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 57, category: "4. Leave Module", subCategory: "Required Information", label: "Leave Carry Forward Rules", requirement: "Yes", status: "Pending", notes: "" },
+            // 3. Leave Module
+            { id: 42, category: "3. Leave Module", subCategory: "Required Information", label: "Leave Types", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 43, category: "3. Leave Module", subCategory: "Required Information", label: "Leave Policies", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 44, category: "3. Leave Module", subCategory: "Required Information", label: "Leave Approval Workflow", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 45, category: "3. Leave Module", subCategory: "Required Information", label: "Leave Accrual Rules", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 46, category: "3. Leave Module", subCategory: "Required Information", label: "Existing Leave Balances", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 47, category: "3. Leave Module", subCategory: "Required Information", label: "Public Holiday Calendar", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 48, category: "3. Leave Module", subCategory: "Required Information", label: "Weekend Definition", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 49, category: "3. Leave Module", subCategory: "Required Information", label: "Leave Carry Forward Rules", requirement: "Yes", status: "Pending", notes: "" },
 
-            { id: 58, category: "4. Leave Module", subCategory: "Documents", label: "Leave Policy Document", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 59, category: "4. Leave Module", subCategory: "Documents", label: "Current Leave Balances Record", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 60, category: "4. Leave Module", subCategory: "Documents", label: "Leave Approval Matrix", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 50, category: "3. Leave Module", subCategory: "Documents", label: "Leave Policy Document", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 51, category: "3. Leave Module", subCategory: "Documents", label: "Current Leave Balances Record", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 52, category: "3. Leave Module", subCategory: "Documents", label: "Leave Approval Matrix", requirement: "Yes", status: "Pending", notes: "" },
 
-            // 5. Loan Management Module
-            { id: 61, category: "5. Loan Management Module", subCategory: "Required Information", label: "Loan Types", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 62, category: "5. Loan Management Module", subCategory: "Required Information", label: "Interest Rates", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 63, category: "5. Loan Management Module", subCategory: "Required Information", label: "Repayment Rules", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 64, category: "5. Loan Management Module", subCategory: "Required Information", label: "Loan Approval Workflow", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 65, category: "5. Loan Management Module", subCategory: "Required Information", label: "Existing Employee Loans", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 66, category: "5. Loan Management Module", subCategory: "Required Information", label: "Loan Limits", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 67, category: "5. Loan Management Module", subCategory: "Required Information", label: "Loan Recovery Rules", requirement: "Yes", status: "Pending", notes: "" },
+            // 4. Loan Management Module
+            { id: 53, category: "4. Loan Management Module", subCategory: "Required Information", label: "Loan Types", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 54, category: "4. Loan Management Module", subCategory: "Required Information", label: "Interest Rates", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 55, category: "4. Loan Management Module", subCategory: "Required Information", label: "Repayment Rules", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 56, category: "4. Loan Management Module", subCategory: "Required Information", label: "Loan Approval Workflow", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 57, category: "4. Loan Management Module", subCategory: "Required Information", label: "Existing Employee Loans", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 58, category: "4. Loan Management Module", subCategory: "Required Information", label: "Loan Limits", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 59, category: "4. Loan Management Module", subCategory: "Required Information", label: "Loan Recovery Rules", requirement: "Yes", status: "Pending", notes: "" },
 
-            { id: 68, category: "5. Loan Management Module", subCategory: "Documents", label: "Loan Policy Document", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 69, category: "5. Loan Management Module", subCategory: "Documents", label: "Existing Loan Schedule", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 70, category: "5. Loan Management Module", subCategory: "Documents", label: "Loan Application Form", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 60, category: "4. Loan Management Module", subCategory: "Documents", label: "Loan Policy Document", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 61, category: "4. Loan Management Module", subCategory: "Documents", label: "Existing Loan Schedule", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 62, category: "4. Loan Management Module", subCategory: "Documents", label: "Loan Application Form", requirement: "Yes", status: "Pending", notes: "" },
 
-            // 6. Performance Management Module
-            { id: 71, category: "6. Performance Management Module", subCategory: "Required Information", label: "Performance Review Periods", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 72, category: "6. Performance Management Module", subCategory: "Required Information", label: "KPIs", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 73, category: "6. Performance Management Module", subCategory: "Required Information", label: "Competency Framework", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 74, category: "6. Performance Management Module", subCategory: "Required Information", label: "Performance Rating Scale", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 75, category: "6. Performance Management Module", subCategory: "Required Information", label: "Performance Workflow", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 76, category: "6. Performance Management Module", subCategory: "Required Information", label: "Reviewer Hierarchy", requirement: "Yes", status: "Pending", notes: "" },
+            // 5. Performance Management Module
+            { id: 63, category: "5. Performance Management Module", subCategory: "Required Information", label: "Performance Review Periods", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 64, category: "5. Performance Management Module", subCategory: "Required Information", label: "KPIs", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 65, category: "5. Performance Management Module", subCategory: "Required Information", label: "Competency Framework", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 66, category: "5. Performance Management Module", subCategory: "Required Information", label: "Performance Rating Scale", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 67, category: "5. Performance Management Module", subCategory: "Required Information", label: "Performance Workflow", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 68, category: "5. Performance Management Module", subCategory: "Required Information", label: "Reviewer Hierarchy", requirement: "Yes", status: "Pending", notes: "" },
 
-            { id: 77, category: "6. Performance Management Module", subCategory: "Documents", label: "Performance Policy Document", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 78, category: "6. Performance Management Module", subCategory: "Documents", label: "Existing Appraisal Forms", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 79, category: "6. Performance Management Module", subCategory: "Documents", label: "KPI Templates", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 69, category: "5. Performance Management Module", subCategory: "Documents", label: "Performance Policy Document", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 70, category: "5. Performance Management Module", subCategory: "Documents", label: "Existing Appraisal Forms", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 71, category: "5. Performance Management Module", subCategory: "Documents", label: "KPI Templates", requirement: "Yes", status: "Pending", notes: "" },
 
-            // 7. Recruitment / Requisition Module
-            { id: 80, category: "7. Recruitment / Requisition Module", subCategory: "Required Information", label: "Recruitment Workflow", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 81, category: "7. Recruitment / Requisition Module", subCategory: "Required Information", label: "Approval Process", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 82, category: "7. Recruitment / Requisition Module", subCategory: "Required Information", label: "Job Categories", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 83, category: "7. Recruitment / Requisition Module", subCategory: "Required Information", label: "Job Templates", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 84, category: "7. Recruitment / Requisition Module", subCategory: "Required Information", label: "Hiring Managers", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 85, category: "7. Recruitment / Requisition Module", subCategory: "Required Information", label: "Recruitment Stages", requirement: "Yes", status: "Pending", notes: "" },
+            // 6. Recruitment / Requisition Module
+            { id: 72, category: "6. Recruitment / Requisition Module", subCategory: "Required Information", label: "Recruitment Workflow", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 73, category: "6. Recruitment / Requisition Module", subCategory: "Required Information", label: "Approval Process", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 74, category: "6. Recruitment / Requisition Module", subCategory: "Required Information", label: "Job Categories", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 75, category: "6. Recruitment / Requisition Module", subCategory: "Required Information", label: "Job Templates", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 76, category: "6. Recruitment / Requisition Module", subCategory: "Required Information", label: "Hiring Managers", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 77, category: "6. Recruitment / Requisition Module", subCategory: "Required Information", label: "Recruitment Stages", requirement: "Yes", status: "Pending", notes: "" },
 
-            { id: 86, category: "7. Recruitment / Requisition Module", subCategory: "Documents", label: "Recruitment Policy Document", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 87, category: "7. Recruitment / Requisition Module", subCategory: "Documents", label: "Job Description Templates", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 88, category: "7. Recruitment / Requisition Module", subCategory: "Documents", label: "Vacancy Request Forms", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 78, category: "6. Recruitment / Requisition Module", subCategory: "Documents", label: "Recruitment Policy Document", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 79, category: "6. Recruitment / Requisition Module", subCategory: "Documents", label: "Job Description Templates", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 80, category: "6. Recruitment / Requisition Module", subCategory: "Documents", label: "Vacancy Request Forms", requirement: "Yes", status: "Pending", notes: "" },
 
-            // 8. Time & Attendance Module
-            { id: 89, category: "8. Time & Attendance Module", subCategory: "Required Information", label: "Working Hours", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 90, category: "8. Time & Attendance Module", subCategory: "Required Information", label: "Shift Patterns", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 91, category: "8. Time & Attendance Module", subCategory: "Required Information", label: "Rotations", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 92, category: "8. Time & Attendance Module", subCategory: "Required Information", label: "Break Rules", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 93, category: "8. Time & Attendance Module", subCategory: "Required Information", label: "Overtime Rules", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 94, category: "8. Time & Attendance Module", subCategory: "Required Information", label: "Late Coming Rules", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 95, category: "8. Time & Attendance Module", subCategory: "Required Information", label: "Early Departure Rules", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 96, category: "8. Time & Attendance Module", subCategory: "Required Information", label: "Weekend Rules", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 97, category: "8. Time & Attendance Module", subCategory: "Required Information", label: "Public Holiday Rules", requirement: "Yes", status: "Pending", notes: "" },
+            // 7. Time & Attendance Module
+            { id: 81, category: "7. Time & Attendance Module", subCategory: "Required Information", label: "Working Hours", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 82, category: "7. Time & Attendance Module", subCategory: "Required Information", label: "Shift Patterns", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 83, category: "7. Time & Attendance Module", subCategory: "Required Information", label: "Rotations", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 84, category: "7. Time & Attendance Module", subCategory: "Required Information", label: "Break Rules", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 85, category: "7. Time & Attendance Module", subCategory: "Required Information", label: "Overtime Rules", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 86, category: "7. Time & Attendance Module", subCategory: "Required Information", label: "Late Coming Rules", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 87, category: "7. Time & Attendance Module", subCategory: "Required Information", label: "Early Departure Rules", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 88, category: "7. Time & Attendance Module", subCategory: "Required Information", label: "Weekend Rules", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 89, category: "7. Time & Attendance Module", subCategory: "Required Information", label: "Public Holiday Rules", requirement: "Yes", status: "Pending", notes: "" },
 
-            { id: 98, category: "8. Time & Attendance Module", subCategory: "Attendance Devices", label: "Biometric Device Details", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 99, category: "8. Time & Attendance Module", subCategory: "Attendance Devices", label: "Attendance Machine Brand", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 100, category: "8. Time & Attendance Module", subCategory: "Attendance Devices", label: "Device IP Address", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 101, category: "8. Time & Attendance Module", subCategory: "Attendance Devices", label: "Device Locations", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 102, category: "8. Time & Attendance Module", subCategory: "Attendance Devices", label: "Existing Attendance Data", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 90, category: "7. Time & Attendance Module", subCategory: "Attendance Devices", label: "Biometric Device Details", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 91, category: "7. Time & Attendance Module", subCategory: "Attendance Devices", label: "Attendance Machine Brand", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 92, category: "7. Time & Attendance Module", subCategory: "Attendance Devices", label: "Device IP Address", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 93, category: "7. Time & Attendance Module", subCategory: "Attendance Devices", label: "Device Locations", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 94, category: "7. Time & Attendance Module", subCategory: "Attendance Devices", label: "Existing Attendance Data", requirement: "Yes", status: "Pending", notes: "" },
 
-            { id: 103, category: "8. Time & Attendance Module", subCategory: "Documents", label: "Attendance Policy Document", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 104, category: "8. Time & Attendance Module", subCategory: "Documents", label: "Shift Roster", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 105, category: "8. Time & Attendance Module", subCategory: "Documents", label: "Overtime Policy", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 95, category: "7. Time & Attendance Module", subCategory: "Documents", label: "Attendance Policy Document", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 96, category: "7. Time & Attendance Module", subCategory: "Documents", label: "Shift Roster", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 97, category: "7. Time & Attendance Module", subCategory: "Documents", label: "Overtime Policy", requirement: "Yes", status: "Pending", notes: "" },
 
-            // 9. User Access & Security
-            { id: 106, category: "9. User Access & Security", subCategory: "Settings", label: "System Users List", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 107, category: "9. User Access & Security", subCategory: "Settings", label: "User Roles Define", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 108, category: "9. User Access & Security", subCategory: "Settings", label: "Approval Hierarchy Matrix", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 109, category: "9. User Access & Security", subCategory: "Settings", label: "Role Permissions Configuration", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 110, category: "9. User Access & Security", subCategory: "Settings", label: "Branch Access Requirements", requirement: "Yes", status: "Pending", notes: "" },
+            // 8. User Access & Security
+            { id: 98, category: "8. User Access & Security", subCategory: "Settings", label: "System Users List", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 99, category: "8. User Access & Security", subCategory: "Settings", label: "User Roles Define", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 105, category: "8. User Access & Security", subCategory: "Settings", label: "Approval Hierarchy Matrix", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 101, category: "8. User Access & Security", subCategory: "Settings", label: "Role Permissions Configuration", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 102, category: "8. User Access & Security", subCategory: "Settings", label: "Branch Access Requirements", requirement: "Yes", status: "Pending", notes: "" },
 
-            // 11. Training Requirements
-            { id: 116, category: "11. Training Requirements", subCategory: "Training", label: "Payroll Team Training Session", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 117, category: "11. Training Requirements", subCategory: "Training", label: "HR Team Training Session", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 118, category: "11. Training Requirements", subCategory: "Training", label: "Managers Portal Walkthrough", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 119, category: "11. Training Requirements", subCategory: "Training", label: "Employees (ESS) Guide Distribution", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 120, category: "11. Training Requirements", subCategory: "Training", label: "System Administrators Core Workshop", requirement: "Yes", status: "Pending", notes: "" },
+            // 9. Training Requirements
+            { id: 103, category: "9. Training Requirements", subCategory: "Training", label: "Payroll Team Training Session", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 104, category: "9. Training Requirements", subCategory: "Training", label: "HR Team Training Session", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 105, category: "9. Training Requirements", subCategory: "Training", label: "Managers Portal Walkthrough", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 106, category: "9. Training Requirements", subCategory: "Training", label: "Employees (ESS) Guide Distribution", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 107, category: "9. Training Requirements", subCategory: "Training", label: "System Administrators Core Workshop", requirement: "Yes", status: "Pending", notes: "" },
 
-            // 12. Sign-Off
-            { id: 121, category: "12. Sign-Off", subCategory: "Sign-Off", label: "All Required Documents Submitted", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 122, category: "12. Sign-Off", subCategory: "Sign-Off", label: "Data Validated and Reconciled", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 123, category: "12. Sign-Off", subCategory: "Sign-Off", label: "Implementation Approved by Lead", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 124, category: "12. Sign-Off", subCategory: "Sign-Off", label: "Training Cycles Scheduled", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 125, category: "12. Sign-Off", subCategory: "Sign-Off", label: "Go-Live Date Formally Confirmed", requirement: "Yes", status: "Pending", notes: "" }
+            // 10. Sign-Off
+            { id: 108, category: "10. Sign-Off", subCategory: "Sign-Off", label: "All Required Documents Submitted", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 109, category: "10. Sign-Off", subCategory: "Sign-Off", label: "Data Validated and Reconciled", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 110, category: "10. Sign-Off", subCategory: "Sign-Off", label: "Implementation Approved by Lead", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 111, category: "10. Sign-Off", subCategory: "Sign-Off", label: "Training Cycles Scheduled", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 112, category: "10. Sign-Off", subCategory: "Sign-Off", label: "Go-Live Date Formally Confirmed", requirement: "Yes", status: "Pending", notes: "" }
         ];
 
         let checklist = [];
@@ -383,7 +375,7 @@
         };
         let activeModuleFilter = "ALL";
 
-        // Global list of unique module names (Company Info and Integrations modules removed)
+        // Global list of unique module names sequentially sorted
         const modules = [
             "ALL",
             "1. Payroll Module",
@@ -403,8 +395,16 @@
             const savedChecklist = localStorage.getItem("corepay_checklist");
             const savedMetadata = localStorage.getItem("corepay_metadata");
 
+            // Ensure the cached copy has exactly 112 sequentially counted elements.
+            // If it doesn't match, we flush to prevent layout or index bugs.
             if (savedChecklist) {
-                checklist = JSON.parse(savedChecklist);
+                const parsed = JSON.parse(savedChecklist);
+                if (parsed.length === 112 && parsed[0].id === 1) {
+                    checklist = parsed;
+                } else {
+                    checklist = JSON.parse(JSON.stringify(rawChecklistData));
+                    saveState();
+                }
             } else {
                 checklist = JSON.parse(JSON.stringify(rawChecklistData));
             }
@@ -681,13 +681,20 @@
         // Toast Messages
         function showToast(message) {
             const toast = document.getElementById('toast');
-            const toastMsg = document.getElementById('toastMessage');
-            toastMsg.innerText = message;
-            toast.style.transform = 'translateY(0)';
-            toast.style.opacity = '1';
+            // If toast container is not in original DOM, create it
+            let toastEl = document.getElementById('toastElement');
+            if (!toastEl) {
+                toastEl = document.createElement('div');
+                toastEl.id = 'toastElement';
+                toastEl.className = 'fixed bottom-5 right-5 bg-slate-900 text-slate-100 dark:bg-white dark:text-slate-900 px-4 py-2.5 rounded-xl shadow-lg border border-slate-800 dark:border-slate-200 text-xs font-bold transition-all duration-300 opacity-0 translate-y-5 z-50';
+                document.body.appendChild(toastEl);
+            }
+            toastEl.innerText = message;
+            toastEl.classList.remove('opacity-0', 'translate-y-5');
+            toastEl.classList.add('opacity-100', 'translate-y-0');
             setTimeout(() => {
-                toast.style.transform = 'translateY(20px)';
-                toast.style.opacity = '0';
+                toastEl.classList.remove('opacity-100', 'translate-y-0');
+                toastEl.classList.add('opacity-0', 'translate-y-5');
             }, 3000);
         }
 
