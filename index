@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CorePay Implementation Checklist & Excel Generator</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- SheetJS (XLSX) Library for client-side Excel compilation -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        mono: ['"JetBrains Mono"', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0fdfa',
+                            100: '#ccfbf1',
+                            500: '#14b8a6', // Teal Accent
+                            600: '#0d9488',
+                            700: '#0f766e',
+                            950: '#042f2e',
+                        },
+                        accent: {
+                            500: '#6366f1', // Indigo Accent
+                            600: '#4f46e5',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom scrollbar configurations */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        /* Custom styles for active categories */
+        .active-tab {
+            background-color: rgba(20, 184, 166, 0.15);
+            border-color: #14b8a6;
+            color: #14b8a6;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans min-h-screen flex flex-col transition-colors duration-300 selection:bg-brand-500 selection:text-slate-900">
+
+    <!-- Top Navigation Header -->
+    <header class="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-6 py-4 flex flex-col sm:flex-row items-center justify-between sticky top-0 z-50 gap-4 transition-colors duration-300">
+        <div class="flex items-center gap-3">
+            <div class="h-10 w-10 rounded-xl bg-gradient-to-tr from-brand-500 to-accent-500 flex items-center justify-center shadow-lg shadow-brand-500/10">
+        
+            </div>
+            <div>
+                <span class="font-extrabold text-xl tracking-tight bg-gradient-to-r from-brand-500 to-accent-500 bg-clip-text text-transparent">CorePay</span>
+                <span class="text-xs font-semibold text-slate-500 dark:text-slate-400 ml-2 uppercase tracking-widest hidden sm:inline-block">Setup Companion</span>
+            </div>
+        </div>
+
+        <!-- Right Side Global Control Deck -->
+        <div class="flex items-center gap-3 w-full sm:w-auto justify-end">
+            <!-- Reset Button -->
+            <button onclick="resetToDefaults()" class="p-2.5 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-all border border-slate-200 dark:border-slate-700 hover:text-red-500 dark:hover:text-red-400" title="Reset All Checklist Data">
+                <i class="fa-solid fa-arrow-rotate-left text-sm"></i>
+            </button>
+            
+            <!-- Dark / Light Mode Switcher -->
+      
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-[1400px] w-full mx-auto px-4 py-6 md:py-8 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        
+        <!-- Left 4-Columns: Meta-intake card and implementation statistics -->
+        <section class="lg:col-span-4 space-y-6">
+            
+            <!-- Implementation Progress Tracker Widget -->
+            <div class="bg-gradient-to-br from-slate-900 to-slate-950 text-white p-6 rounded-2xl border border-slate-800 shadow-xl relative overflow-hidden">
+                <div class="absolute -right-12 -top-12 w-32 h-32 bg-brand-500/10 rounded-full blur-2xl"></div>
+                <div class="absolute -left-12 -bottom-12 w-32 h-32 bg-accent-500/10 rounded-full blur-2xl"></div>
+                
+                <h2 class="text-sm font-bold uppercase tracking-widest text-slate-400 mb-4 flex items-center gap-2">
+                  
+                </h2>
+
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-xs text-slate-400">Implementation Milestones Complete</span>
+                    <span id="metricPercent" class="text-2xl font-black text-brand-500 font-mono">0%</span>
+                </div>
+
+                <!-- Custom Progress Bar Container -->
+                <div class="w-full bg-slate-800 h-3 rounded-full overflow-hidden border border-slate-700 mb-6">
+                    <div id="metricProgressBar" class="bg-gradient-to-r from-brand-500 to-accent-500 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800/80 text-center">
+                        <span id="metricCompleted" class="text-xl font-bold font-mono text-slate-100">0</span>
+                        <p class="text-[10px] text-slate-500 uppercase tracking-widest font-semibold mt-1">Completed Items</p>
+                    </div>
+                    <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800/80 text-center">
+                        <span id="metricTotal" class="text-xl font-bold font-mono text-slate-300">114</span>
+                        <p class="text-[10px] text-slate-500 uppercase tracking-widest font-semibold mt-1">Total Tasks</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Client Metadata Card -->
+            <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+                <div class="flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-3 mb-2">
+                    <i class="fa-solid fa-building text-brand-500 text-lg"></i>
+                    <h2 class="font-bold text-slate-800 dark:text-slate-100">Client Information</h2>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">Company Name</label>
+                    <input type="text" id="metaCompany" oninput="saveMetadata()" placeholder="Enter Company Name" class="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 focus:outline-none focus:border-brand-500 text-sm">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">Project Contact Person</label>
+                    <input type="text" id="metaContact" oninput="saveMetadata()" placeholder="Enter Contact Person" class="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 focus:outline-none focus:border-brand-500 text-sm">
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">Email Address</label>
+                        <input type="email" id="metaEmail" oninput="saveMetadata()" placeholder="name@company.com" class="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 focus:outline-none focus:border-brand-500 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">Phone Number</label>
+                        <input type="text" id="metaPhone" oninput="saveMetadata()" placeholder="Phone" class="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 focus:outline-none focus:border-brand-500 text-sm">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1.5">Implementation Start Date</label>
+                    <input type="date" id="metaStartDate" oninput="saveMetadata()" class="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 focus:outline-none focus:border-brand-500 text-sm font-mono text-slate-700 dark:text-slate-300">
+                </div>
+            </div>
+
+            <!-- Filter Categories Selector Sidebar -->
+            <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-2">
+                <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider block mb-2 px-2">Checklist Modules</span>
+                <nav id="moduleFilterList" class="flex flex-col gap-1">
+                    <!-- Dynamic insertion of module filters in JS -->
+                </nav>
+            </div>
+        </section>
+
+        <!-- Right 8-Columns: Detailed Implementation Checklist -->
+        <section class="lg:col-span-8 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden flex flex-col">
+            
+            <!-- Table Header Operations (Search & Quick Selection Filters) -->
+            <div class="p-4 sm:p-6 border-b border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="relative w-full sm:max-w-xs">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                        <i class="fa-solid fa-magnifying-glass text-sm"></i>
+                    </span>
+                    <input type="text" id="checklistSearch" onkeyup="filterChecklist()" placeholder="Search items..." class="w-full pl-9 pr-4 py-2 rounded-lg bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs focus:outline-none focus:border-brand-500">
+                </div>
+
+                <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+                    <span class="text-xs text-slate-500">Show Status:</span>
+                    <select id="statusFilter" onchange="filterChecklist()" class="px-3 py-2 rounded-lg bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-700 dark:text-slate-300 focus:outline-none focus:border-brand-500">
+                        <option value="ALL">All Statuses</option>
+                        <option value="Pending">Pending</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Completed">Completed</option>
+                        <option value="N/A">N/A</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Dynamic Table Container -->
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-slate-50 dark:bg-slate-950/60 border-b border-slate-200 dark:border-slate-800 text-[10px] font-mono text-slate-400 uppercase tracking-widest">
+                        <tr>
+                            <th class="p-4 w-12 text-center">Done</th>
+                            <th class="p-4">Checklist Item</th>
+                            <th class="p-4 w-32">Requirement</th>
+                            <th class="p-4 w-36">Status</th>
+                            <th class="p-4 w-44">Notes / Target Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="checklistBody" class="divide-y divide-slate-100 dark:divide-slate-800/60 text-xs">
+                        <!-- Items injected dynamically -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Empty State -->
+            <div id="emptyState" class="hidden flex-col items-center justify-center p-12 text-center">
+                <span class="text-4xl mb-3">🔍</span>
+                <h3 class="font-bold text-slate-800 dark:text-slate-200 mb-1 text-sm">No items match your search</h3>
+                <p class="text-xs text-slate-500">Try adjusting your filters or clearing search keys</p>
+            </div>
+        </section>
+    </main>
+
+    <!-- Page Footer -->
+    <footer class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 py-6 text-center text-xs text-slate-400 mt-12">
+        <p>© 2026 CorePay AI System Setup & Integrations Companion. Complies with Global SOC2 Trust standards.</p>
+    </footer>
+
+    <script>
+        // Core Checklist Dataset matching all 12 modules from the client request
+        const rawChecklistData = [
+            // 1. Company Information
+            { id: 1, category: "1. Company Information", subCategory: "General Info", label: "Company Registration Documents", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 2, category: "1. Company Information", subCategory: "General Info", label: "Company Logo", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 3, category: "1. Company Information", subCategory: "General Info", label: "Company Branches/Locations", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 4, category: "1. Company Information", subCategory: "General Info", label: "Company Departments", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 5, category: "1. Company Information", subCategory: "General Info", label: "Organizational Structure", requirement: "Optional", status: "Pending", notes: "" },
+            { id: 6, category: "1. Company Information", subCategory: "General Info", label: "Cost Centres", requirement: "If Applicable", status: "Pending", notes: "" },
+            { id: 7, category: "1. Company Information", subCategory: "General Info", label: "Job Titles/Positions", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 8, category: "1. Company Information", subCategory: "General Info", label: "Employee Grades/Bands", requirement: "If Applicable", status: "Pending", notes: "" },
+
+            // 2. Payroll Module
+            { id: 9, category: "2. Payroll Module", subCategory: "Employee Information", label: "Employee Master List", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 10, category: "2. Payroll Module", subCategory: "Employee Information", label: "Employee Numbers", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 11, category: "2. Payroll Module", subCategory: "Employee Information", label: "National IDs/Passport Numbers", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 12, category: "2. Payroll Module", subCategory: "Employee Information", label: "Tax Numbers", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 13, category: "2. Payroll Module", subCategory: "Employee Information", label: "NSSA/Social Security Numbers", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 14, category: "2. Payroll Module", subCategory: "Employee Information", label: "Bank Details", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 15, category: "2. Payroll Module", subCategory: "Employee Information", label: "Salary Details", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 16, category: "2. Payroll Module", subCategory: "Employee Information", label: "Employment Dates", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 17, category: "2. Payroll Module", subCategory: "Employee Information", label: "Employment Status", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 18, category: "2. Payroll Module", subCategory: "Employee Information", label: "Contract Types", requirement: "Yes", status: "Pending", notes: "" },
+
+            { id: 19, category: "2. Payroll Module", subCategory: "Payroll Setup", label: "Earnings & Allowance Structure", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 20, category: "2. Payroll Module", subCategory: "Payroll Setup", label: "Deduction Codes", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 21, category: "2. Payroll Module", subCategory: "Payroll Setup", label: "Tax Tables", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 22, category: "2. Payroll Module", subCategory: "Payroll Setup", label: "Pension Rules", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 23, category: "2. Payroll Module", subCategory: "Payroll Setup", label: "Medical Aid Rules", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 24, category: "2. Payroll Module", subCategory: "Payroll Setup", label: "Loan Deductions", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 25, category: "2. Payroll Module", subCategory: "Payroll Setup", label: "Overtime Rules", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 26, category: "2. Payroll Module", subCategory: "Payroll Setup", label: "Shift Allowances", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 27, category: "2. Payroll Module", subCategory: "Payroll Setup", label: "Payroll Calendar", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 28, category: "2. Payroll Module", subCategory: "Payroll Setup", label: "Pay Frequencies", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 29, category: "2. Payroll Module", subCategory: "Payroll Setup", label: "Public Holidays", requirement: "Yes", status: "Pending", notes: "" },
+
+            { id: 30, category: "2. Payroll Module", subCategory: "Payroll Documents", label: "Latest Payslip", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 31, category: "2. Payroll Module", subCategory: "Payroll Documents", label: "Previous Payroll Reports", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 32, category: "2. Payroll Module", subCategory: "Payroll Documents", label: "Current Payroll Input Template", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 33, category: "2. Payroll Module", subCategory: "Payroll Documents", label: "Payroll Policies", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 34, category: "2. Payroll Module", subCategory: "Payroll Documents", label: "Tax Registration Certificate", requirement: "Yes", status: "Pending", notes: "" },
+
+            // 3. HR Module
+            { id: 35, category: "3. HR Module", subCategory: "Required Information", label: "Employee Personal Details", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 36, category: "3. HR Module", subCategory: "Required Information", label: "Emergency Contacts", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 37, category: "3. HR Module", subCategory: "Required Information", label: "Qualifications", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 38, category: "3. HR Module", subCategory: "Required Information", label: "Employment Contracts", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 39, category: "3. HR Module", subCategory: "Required Information", label: "Employee Photos", requirement: "Optional", status: "Pending", notes: "" },
+            { id: 40, category: "3. HR Module", subCategory: "Required Information", label: "Next of Kin Information", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 41, category: "3. HR Module", subCategory: "Required Information", label: "Reporting Structure", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 42, category: "3. HR Module", subCategory: "Required Information", label: "Departments", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 43, category: "3. HR Module", subCategory: "Required Information", label: "Positions", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 44, category: "3. HR Module", subCategory: "Required Information", label: "Branch Allocation", requirement: "Yes", status: "Pending", notes: "" },
+
+            { id: 45, category: "3. HR Module", subCategory: "HR Documents", label: "HR Policies", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 46, category: "3. HR Module", subCategory: "HR Documents", label: "Employee Handbook", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 47, category: "3. HR Module", subCategory: "HR Documents", label: "Employment Contracts Reference", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 48, category: "3. HR Module", subCategory: "HR Documents", label: "Organizational Chart", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 49, category: "3. HR Module", subCategory: "HR Documents", label: "Code of Conduct", requirement: "Yes", status: "Pending", notes: "" },
+
+            // 4. Leave Module
+            { id: 50, category: "4. Leave Module", subCategory: "Required Information", label: "Leave Types", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 51, category: "4. Leave Module", subCategory: "Required Information", label: "Leave Policies", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 52, category: "4. Leave Module", subCategory: "Required Information", label: "Leave Approval Workflow", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 53, category: "4. Leave Module", subCategory: "Required Information", label: "Leave Accrual Rules", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 54, category: "4. Leave Module", subCategory: "Required Information", label: "Existing Leave Balances", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 55, category: "4. Leave Module", subCategory: "Required Information", label: "Public Holiday Calendar", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 56, category: "4. Leave Module", subCategory: "Required Information", label: "Weekend Definition", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 57, category: "4. Leave Module", subCategory: "Required Information", label: "Leave Carry Forward Rules", requirement: "Yes", status: "Pending", notes: "" },
+
+            { id: 58, category: "4. Leave Module", subCategory: "Documents", label: "Leave Policy Document", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 59, category: "4. Leave Module", subCategory: "Documents", label: "Current Leave Balances Record", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 60, category: "4. Leave Module", subCategory: "Documents", label: "Leave Approval Matrix", requirement: "Yes", status: "Pending", notes: "" },
+
+            // 5. Loan Management Module
+            { id: 61, category: "5. Loan Management Module", subCategory: "Required Information", label: "Loan Types", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 62, category: "5. Loan Management Module", subCategory: "Required Information", label: "Interest Rates", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 63, category: "5. Loan Management Module", subCategory: "Required Information", label: "Repayment Rules", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 64, category: "5. Loan Management Module", subCategory: "Required Information", label: "Loan Approval Workflow", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 65, category: "5. Loan Management Module", subCategory: "Required Information", label: "Existing Employee Loans", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 66, category: "5. Loan Management Module", subCategory: "Required Information", label: "Loan Limits", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 67, category: "5. Loan Management Module", subCategory: "Required Information", label: "Loan Recovery Rules", requirement: "Yes", status: "Pending", notes: "" },
+
+            { id: 68, category: "5. Loan Management Module", subCategory: "Documents", label: "Loan Policy Document", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 69, category: "5. Loan Management Module", subCategory: "Documents", label: "Existing Loan Schedule", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 70, category: "5. Loan Management Module", subCategory: "Documents", label: "Loan Application Form", requirement: "Yes", status: "Pending", notes: "" },
+
+            // 6. Performance Management Module
+            { id: 71, category: "6. Performance Management Module", subCategory: "Required Information", label: "Performance Review Periods", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 72, category: "6. Performance Management Module", subCategory: "Required Information", label: "KPIs", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 73, category: "6. Performance Management Module", subCategory: "Required Information", label: "Competency Framework", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 74, category: "6. Performance Management Module", subCategory: "Required Information", label: "Performance Rating Scale", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 75, category: "6. Performance Management Module", subCategory: "Required Information", label: "Performance Workflow", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 76, category: "6. Performance Management Module", subCategory: "Required Information", label: "Reviewer Hierarchy", requirement: "Yes", status: "Pending", notes: "" },
+
+            { id: 77, category: "6. Performance Management Module", subCategory: "Documents", label: "Performance Policy Document", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 78, category: "6. Performance Management Module", subCategory: "Documents", label: "Existing Appraisal Forms", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 79, category: "6. Performance Management Module", subCategory: "Documents", label: "KPI Templates", requirement: "Yes", status: "Pending", notes: "" },
+
+            // 7. Recruitment / Requisition Module
+            { id: 80, category: "7. Recruitment / Requisition Module", subCategory: "Required Information", label: "Recruitment Workflow", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 81, category: "7. Recruitment / Requisition Module", subCategory: "Required Information", label: "Approval Process", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 82, category: "7. Recruitment / Requisition Module", subCategory: "Required Information", label: "Job Categories", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 83, category: "7. Recruitment / Requisition Module", subCategory: "Required Information", label: "Job Templates", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 84, category: "7. Recruitment / Requisition Module", subCategory: "Required Information", label: "Hiring Managers", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 85, category: "7. Recruitment / Requisition Module", subCategory: "Required Information", label: "Recruitment Stages", requirement: "Yes", status: "Pending", notes: "" },
+
+            { id: 86, category: "7. Recruitment / Requisition Module", subCategory: "Documents", label: "Recruitment Policy Document", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 87, category: "7. Recruitment / Requisition Module", subCategory: "Documents", label: "Job Description Templates", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 88, category: "7. Recruitment / Requisition Module", subCategory: "Documents", label: "Vacancy Request Forms", requirement: "Yes", status: "Pending", notes: "" },
+
+            // 8. Time & Attendance Module
+            { id: 89, category: "8. Time & Attendance Module", subCategory: "Required Information", label: "Working Hours", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 90, category: "8. Time & Attendance Module", subCategory: "Required Information", label: "Shift Patterns", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 91, category: "8. Time & Attendance Module", subCategory: "Required Information", label: "Rotations", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 92, category: "8. Time & Attendance Module", subCategory: "Required Information", label: "Break Rules", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 93, category: "8. Time & Attendance Module", subCategory: "Required Information", label: "Overtime Rules", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 94, category: "8. Time & Attendance Module", subCategory: "Required Information", label: "Late Coming Rules", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 95, category: "8. Time & Attendance Module", subCategory: "Required Information", label: "Early Departure Rules", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 96, category: "8. Time & Attendance Module", subCategory: "Required Information", label: "Weekend Rules", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 97, category: "8. Time & Attendance Module", subCategory: "Required Information", label: "Public Holiday Rules", requirement: "Yes", status: "Pending", notes: "" },
+
+            { id: 98, category: "8. Time & Attendance Module", subCategory: "Attendance Devices", label: "Biometric Device Details", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 99, category: "8. Time & Attendance Module", subCategory: "Attendance Devices", label: "Attendance Machine Brand", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 100, category: "8. Time & Attendance Module", subCategory: "Attendance Devices", label: "Device IP Address", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 101, category: "8. Time & Attendance Module", subCategory: "Attendance Devices", label: "Device Locations", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 102, category: "8. Time & Attendance Module", subCategory: "Attendance Devices", label: "Existing Attendance Data", requirement: "Yes", status: "Pending", notes: "" },
+
+            { id: 103, category: "8. Time & Attendance Module", subCategory: "Documents", label: "Attendance Policy Document", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 104, category: "8. Time & Attendance Module", subCategory: "Documents", label: "Shift Roster", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 105, category: "8. Time & Attendance Module", subCategory: "Documents", label: "Overtime Policy", requirement: "Yes", status: "Pending", notes: "" },
+
+            // 9. User Access & Security
+            { id: 106, category: "9. User Access & Security", subCategory: "Settings", label: "System Users List", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 107, category: "9. User Access & Security", subCategory: "Settings", label: "User Roles Define", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 108, category: "9. User Access & Security", subCategory: "Settings", label: "Approval Hierarchy Matrix", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 109, category: "9. User Access & Security", subCategory: "Settings", label: "Role Permissions Configuration", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 110, category: "9. User Access & Security", subCategory: "Settings", label: "Branch Access Requirements", requirement: "Yes", status: "Pending", notes: "" },
+
+            // 10. Integrations (If Applicable)
+            { id: 111, category: "10. Integrations (If Applicable)", subCategory: "Integrations", label: "Accounting System Details", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 112, category: "10. Integrations (If Applicable)", subCategory: "Integrations", label: "Banking Integration Requirements", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 113, category: "10. Integrations (If Applicable)", subCategory: "Integrations", label: "ERP Integration Specs", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 114, category: "10. Integrations (If Applicable)", subCategory: "Integrations", label: "Biometric Integration Setup", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 115, category: "10. Integrations (If Applicable)", subCategory: "Integrations", label: "API Requirements Definition", requirement: "Yes", status: "Pending", notes: "" },
+
+            // 11. Training Requirements
+            { id: 116, category: "11. Training Requirements", subCategory: "Training", label: "Payroll Team Training Session", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 117, category: "11. Training Requirements", subCategory: "Training", label: "HR Team Training Session", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 118, category: "11. Training Requirements", subCategory: "Training", label: "Managers Portal Walkthrough", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 119, category: "11. Training Requirements", subCategory: "Training", label: "Employees (ESS) Guide Distribution", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 120, category: "11. Training Requirements", subCategory: "Training", label: "System Administrators Core Workshop", requirement: "Yes", status: "Pending", notes: "" },
+
+            // 12. Sign-Off
+            { id: 121, category: "12. Sign-Off", subCategory: "Sign-Off", label: "All Required Documents Submitted", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 122, category: "12. Sign-Off", subCategory: "Sign-Off", label: "Data Validated and Reconciled", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 123, category: "12. Sign-Off", subCategory: "Sign-Off", label: "Implementation Approved by Lead", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 124, category: "12. Sign-Off", subCategory: "Sign-Off", label: "Training Cycles Scheduled", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 125, category: "12. Sign-Off", subCategory: "Sign-Off", label: "Go-Live Date Formally Confirmed", requirement: "Yes", status: "Pending", notes: "" }
+        ];
+
+        let checklist = [];
+        let metadata = {
+            company: "",
+            contact: "",
+            email: "",
+            phone: "",
+            startDate: ""
+        };
+        let activeModuleFilter = "ALL";
+
+        // Global list of unique module names
+        const modules = [
+            "ALL",
+            "1. Company Information",
+            "2. Payroll Module",
+            "3. HR Module",
+            "4. Leave Module",
+            "5. Loan Management Module",
+            "6. Performance Management Module",
+            "7. Recruitment / Requisition Module",
+            "8. Time & Attendance Module",
+            "9. User Access & Security",
+            "10. Integrations (If Applicable)",
+            "11. Training Requirements",
+            "12. Sign-Off"
+        ];
+
+        // Retrieve saved database state or start fresh
+        function loadState() {
+            const savedChecklist = localStorage.getItem("corepay_checklist");
+            const savedMetadata = localStorage.getItem("corepay_metadata");
+
+            if (savedChecklist) {
+                checklist = JSON.parse(savedChecklist);
+            } else {
+                checklist = JSON.parse(JSON.stringify(rawChecklistData));
+            }
+
+            if (savedMetadata) {
+                metadata = JSON.parse(savedMetadata);
+                document.getElementById("metaCompany").value = metadata.company || "";
+                document.getElementById("metaContact").value = metadata.contact || "";
+                document.getElementById("metaEmail").value = metadata.email || "";
+                document.getElementById("metaPhone").value = metadata.phone || "";
+                document.getElementById("metaStartDate").value = metadata.startDate || "";
+            }
+        }
+
+        // Write state directly back into persistent browser storage
+        function saveState() {
+            localStorage.setItem("corepay_checklist", JSON.stringify(checklist));
+        }
+
+        function saveMetadata() {
+            metadata.company = document.getElementById("metaCompany").value;
+            metadata.contact = document.getElementById("metaContact").value;
+            metadata.email = document.getElementById("metaEmail").value;
+            metadata.phone = document.getElementById("metaPhone").value;
+            metadata.startDate = document.getElementById("metaStartDate").value;
+            localStorage.setItem("corepay_metadata", JSON.stringify(metadata));
+        }
+
+        function resetToDefaults() {
+            if (confirm("Are you sure you want to clear all updates and reset this implementation checklist back to default?")) {
+                localStorage.removeItem("corepay_checklist");
+                localStorage.removeItem("corepay_metadata");
+                checklist = JSON.parse(JSON.stringify(rawChecklistData));
+                metadata = { company: "", contact: "", email: "", phone: "", startDate: "" };
+                
+                document.getElementById("metaCompany").value = "";
+                document.getElementById("metaContact").value = "";
+                document.getElementById("metaEmail").value = "";
+                document.getElementById("metaPhone").value = "";
+                document.getElementById("metaStartDate").value = "";
+                
+                showToast("Checklist successfully reset!");
+                saveState();
+                saveMetadata();
+                renderFilters();
+                renderChecklist();
+                updateCalculatedMetrics();
+            }
+        }
+
+        // Render left hand sidebar filters dynamically
+        function renderFilters() {
+            const container = document.getElementById("moduleFilterList");
+            container.innerHTML = "";
+
+            modules.forEach(mod => {
+                // Calculate outstanding count per module
+                const count = mod === "ALL" 
+                    ? checklist.length 
+                    : checklist.filter(item => item.category === mod).length;
+
+                const completed = mod === "ALL"
+                    ? checklist.filter(item => item.status === "Completed").length
+                    : checklist.filter(item => item.category === mod && item.status === "Completed").length;
+
+                const btn = document.createElement("button");
+                btn.onclick = () => {
+                    activeModuleFilter = mod;
+                    renderFilters();
+                    renderChecklist();
+                };
+
+                const isActive = activeModuleFilter === mod;
+                btn.className = `w-full text-left px-3 py-2 rounded-xl text-xs font-bold transition-all border flex items-center justify-between outline-none ${
+                    isActive 
+                        ? 'bg-brand-500/15 border-brand-500 text-brand-500 shadow-sm shadow-brand-500/10' 
+                        : 'bg-transparent border-transparent text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/60'
+                }`;
+
+                btn.innerHTML = `
+                    <span class="truncate pr-2">${mod === "ALL" ? "⭐ Show All Modules" : mod}</span>
+                    <span class="px-1.5 py-0.5 rounded-full bg-slate-200 dark:bg-slate-800 text-[10px] font-mono text-slate-600 dark:text-slate-400">
+                        ${completed}/${count}
+                    </span>
+                `;
+                container.appendChild(btn);
+            });
+        }
+
+        // Render table checklist content dynamically
+        function renderChecklist() {
+            const tbody = document.getElementById("checklistBody");
+            const empty = document.getElementById("emptyState");
+            tbody.innerHTML = "";
+
+            const searchQuery = document.getElementById("checklistSearch").value.toLowerCase();
+            const statusFilter = document.getElementById("statusFilter").value;
+
+            // Apply filter chain
+            let filtered = checklist;
+
+            if (activeModuleFilter !== "ALL") {
+                filtered = filtered.filter(item => item.category === activeModuleFilter);
+            }
+
+            if (statusFilter !== "ALL") {
+                filtered = filtered.filter(item => item.status === statusFilter);
+            }
+
+            if (searchQuery.trim() !== "") {
+                filtered = filtered.filter(item => 
+                    item.label.toLowerCase().includes(searchQuery) ||
+                    item.subCategory.toLowerCase().includes(searchQuery) ||
+                    item.notes.toLowerCase().includes(searchQuery)
+                );
+            }
+
+            if (filtered.length === 0) {
+                empty.classList.remove("hidden");
+                empty.classList.add("flex");
+            } else {
+                empty.classList.add("hidden");
+                empty.classList.remove("flex");
+            }
+
+            // Group table visually if active module filter is 'ALL'
+            let currentGroup = "";
+
+            filtered.forEach(item => {
+                if (activeModuleFilter === "ALL" && currentGroup !== item.category) {
+                    currentGroup = item.category;
+                    const groupRow = document.createElement("tr");
+                    groupRow.className = "bg-slate-100/60 dark:bg-slate-950/40 select-none";
+                    groupRow.innerHTML = `
+                        <td colspan="5" class="p-3 font-extrabold text-[10px] uppercase tracking-wider text-slate-500 dark:text-slate-400 border-y border-slate-200 dark:border-slate-800/80">
+                            📁 ${currentGroup}
+                        </td>
+                    `;
+                    tbody.appendChild(groupRow);
+                }
+
+                const row = document.createElement("tr");
+                row.className = `hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-all ${
+                    item.status === 'Completed' ? 'opacity-85 dark:opacity-70 bg-slate-50/30 dark:bg-slate-900/10' : ''
+                }`;
+
+                // Status styling helpers
+                let badgeStyle = "bg-slate-100 text-slate-700 dark:bg-slate-850 dark:text-slate-300";
+                if (item.status === "Completed") badgeStyle = "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20";
+                if (item.status === "In Progress") badgeStyle = "bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-500/20";
+                if (item.status === "N/A") badgeStyle = "bg-slate-200/50 text-slate-500 dark:bg-slate-800/50 dark:text-slate-500";
+
+                row.innerHTML = `
+                    <td class="p-4 text-center">
+                        <button onclick="toggleCompleted(${item.id})" class="h-5 w-5 rounded border flex items-center justify-center transition-all ${
+                            item.status === 'Completed'
+                                ? 'bg-brand-500 border-brand-500 text-slate-950'
+                                : 'border-slate-300 dark:border-slate-700 hover:border-brand-500 text-transparent'
+                        }">
+                            <i class="fa-solid fa-check text-[10px] font-black"></i>
+                        </button>
+                    </td>
+                    <td class="p-4">
+                        <div class="font-bold text-slate-800 dark:text-slate-200">${item.label}</div>
+                        <div class="text-[10px] text-slate-400 font-mono mt-0.5">${item.subCategory}</div>
+                    </td>
+                    <td class="p-4">
+                        <span class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[10px] text-slate-600 dark:text-slate-400">
+                            ${item.requirement}
+                        </span>
+                    </td>
+                    <td class="p-4">
+                        <select onchange="updateStatus(${item.id}, this.value)" class="w-full px-2 py-1.5 rounded-lg border bg-white dark:bg-slate-950 text-xs border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 focus:outline-none">
+                            <option value="Pending" ${item.status === 'Pending' ? 'selected' : ''}>Pending</option>
+                            <option value="In Progress" ${item.status === 'In Progress' ? 'selected' : ''}>In Progress</option>
+                            <option value="Completed" ${item.status === 'Completed' ? 'selected' : ''}>Completed</option>
+                            <option value="N/A" ${item.status === 'N/A' ? 'selected' : ''}>N/A</option>
+                        </select>
+                    </td>
+                    <td class="p-4">
+                        <input type="text" value="${item.notes || ''}" onchange="updateNotes(${item.id}, this.value)" placeholder="Target date, comments..." class="w-full px-2 py-1.5 rounded bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800/80 text-xs focus:outline-none focus:border-brand-500">
+                    </td>
+                `;
+
+                tbody.appendChild(row);
+            });
+        }
+
+        // Toggle Completed helper
+        function toggleCompleted(id) {
+            const index = checklist.findIndex(i => i.id === id);
+            if (index !== -1) {
+                checklist[index].status = checklist[index].status === "Completed" ? "Pending" : "Completed";
+                saveState();
+                renderFilters();
+                renderChecklist();
+                updateCalculatedMetrics();
+            }
+        }
+
+        // Dropdown status updates
+        function updateStatus(id, value) {
+            const index = checklist.findIndex(i => i.id === id);
+            if (index !== -1) {
+                checklist[index].status = value;
+                saveState();
+                renderFilters();
+                renderChecklist();
+                updateCalculatedMetrics();
+            }
+        }
+
+        // Custom Notes input syncing
+        function updateNotes(id, value) {
+            const index = checklist.findIndex(i => i.id === id);
+            if (index !== -1) {
+                checklist[index].notes = value;
+                saveState();
+            }
+        }
+
+        // Live calculation and metric updates
+        function updateCalculatedMetrics() {
+            const total = checklist.length;
+            const completed = checklist.filter(item => item.status === "Completed").length;
+            const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
+
+            document.getElementById("metricCompleted").innerText = completed;
+            document.getElementById("metricTotal").innerText = total;
+            document.getElementById("metricPercent").innerText = `${percent}%`;
+            document.getElementById("metricProgressBar").style.width = `${percent}%`;
+        }
+
+        // Filter triggers
+        function filterChecklist() {
+            renderChecklist();
+        }
+
+        // Theme Toggle Controller
+        function toggleTheme() {
+            const html = document.documentElement;
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+                showToast('Light Mode Enabled');
+            } else {
+                html.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+                showToast('Dark Mode Enabled');
+            }
+        }
+
+        // Toast Messages
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toastMessage');
+            toastMsg.innerText = message;
+            toast.style.transform = 'translateY(0)';
+            toast.style.opacity = '1';
+            setTimeout(() => {
+                toast.style.transform = 'translateY(20px)';
+                toast.style.opacity = '0';
+            }, 3000);
+        }
+
+        // Excel Downloader Engine compiling multiple Sheets on-the-fly
+        function downloadAsExcel() {
+            try {
+                // Ensure there is at least a Company Name set
+                const compName = metadata.company || "CorePay Setup";
+
+                // 1. Build Sheet 1: Dashboard and Implementation Overview metadata
+                const summaryInfo = [
+                    ["CorePay AI Implementation & Document Checklist"],
+                    [],
+                    ["Client & Project Information"],
+                    ["Company Name", metadata.company || "___________________________________________"],
+                    ["Project Contact Person", metadata.contact || "___________________________________________"],
+                    ["Email Address", metadata.email || "______________________"],
+                    ["Phone Number", metadata.phone || "_____________________"],
+                    ["Implementation Start Date", metadata.startDate || "______________________"],
+                    [],
+                    ["Implementation Progress"],
+                    ["Total Checklist Tasks", checklist.length],
+                    ["Completed Milestones", checklist.filter(item => item.status === "Completed").length],
+                    ["Go-Live Readiness Rate", ((checklist.filter(item => item.status === "Completed").length / checklist.length) * 100).toFixed(1) + "%"],
+                    [],
+                    ["Form Sign-Off Approval Checklist"],
+                    ["Milestone", "Status", "Target Date / Notes"],
+                    ["All Required Documents Submitted", "Pending", ""],
+                    ["Data Validated and Reconciled", "Pending", ""],
+                    ["Implementation Approved by Lead", "Pending", ""],
+                    ["Training Cycles Scheduled", "Pending", ""],
+                    ["Go-Live Date Formally Confirmed", "Pending", ""]
+                ];
+
+                const wsOverview = XLSX.utils.aoa_to_sheet(summaryInfo);
+
+                // 2. Build Sheet 2: The full, structured Checklist table containing custom updates
+                const checklistHeader = ["Section Module", "Sub-Category Category", "Checklist Item Task", "Requirement Type", "Live Progress Status", "Notes / Comments"];
+                const checklistRows = [];
+
+                checklist.forEach(item => {
+                    checklistRows.push([
+                        item.category,
+                        item.subCategory,
+                        item.label,
+                        item.requirement,
+                        item.status,
+                        item.notes || ""
+                    ]);
+                });
+
+                const wsChecklist = XLSX.utils.aoa_to_sheet([checklistHeader, ...checklistRows]);
+
+                // Create clean default column widths to prevent ugly cell text clippings
+                const wscolsOverview = [
+                    {wch: 30},
+                    {wch: 45},
+                    {wch: 25}
+                ];
+                const wscolsChecklist = [
+                    {wch: 35},
+                    {wch: 25},
+                    {wch: 45},
+                    {wch: 18},
+                    {wch: 18},
+                    {wch: 40}
+                ];
+
+                wsOverview['!cols'] = wscolsOverview;
+                wsChecklist['!cols'] = wscolsChecklist;
+
+                // Create empty workbook and append both compilation sheets
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, wsOverview, "Implementation Overview");
+                XLSX.utils.book_append_sheet(wb, wsChecklist, "Detailed Checklists");
+
+                // Generate trigger filename
+                const safeFileName = compName.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+                const fileName = `${safeFileName}_implementation_checklist.xlsx`;
+
+                // Perform direct download execution
+                XLSX.writeFile(wb, fileName);
+                showToast("Excel download initiated successfully!");
+            } catch (err) {
+                console.error("SheetJS Compilation Error: ", err);
+                showToast("Export failed. Please check developer console logs.");
+            }
+        }
+        // Initialize state on window load
+        window.onload = function() {
+            // Check theme settings
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            if (savedTheme === 'dark') {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+
+            loadState();
+            renderFilters();
+            renderChecklist();
+            updateCalculatedMetrics();
+        }
+    </script>
+</body>
+</html>
