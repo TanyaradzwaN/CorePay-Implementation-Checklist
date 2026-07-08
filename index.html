@@ -11,7 +11,11 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Firebase Compat SDKs for Enterprise Real-time Sync -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 
     <script>
         tailwind.config = {
@@ -41,7 +45,6 @@
         }
     </script>
     <style>
-        /* Custom scrollbar configurations */
         .no-scrollbar::-webkit-scrollbar {
             display: none;
         }
@@ -57,12 +60,18 @@
     <header class="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-6 py-4 flex flex-col sm:flex-row items-center justify-between sticky top-0 z-50 gap-4 transition-colors duration-300">
         <div class="flex items-center gap-3">
             <div class="bg-white p-1.5 rounded-lg shadow-sm border border-slate-200 dark:border-slate-800 flex items-center justify-center">
-                <img src="logo.png" alt="CorePay Logo" class="h-9 object-contain" onerror="this.src='https://placehold.co/160x50/ffffff/1e40af?text=CorePay'">
+                <img src="Screenshot 2025-02-12 at 15.12.16.png" alt="CorePay Logo" class="h-9 object-contain" onerror="this.src='https://placehold.co/160x50/ffffff/1e40af?text=CorePay'">
             </div>
         </div>
 
-        <!-- Right Side Global Control Deck -->
+        <!-- Right Side Global Control Deck & Cloud Status -->
         <div class="flex items-center gap-3 w-full sm:w-auto justify-end">
+            <!-- Cloud Connection Status Trigger -->
+            <button onclick="openCollabModal()" class="px-3.5 py-2 rounded-lg text-xs font-bold transition-all border flex items-center gap-2 outline-none shadow-sm" id="cloudStatusBtn">
+                <i class="fa-solid fa-cloud-arrow-up" id="cloudIcon"></i>
+                <span id="cloudStatusText">Local Only</span>
+            </button>
+
             <!-- Reset Button -->
             <button onclick="resetToDefaults()" class="p-2.5 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-all border border-slate-200 dark:border-slate-700 hover:text-red-500 dark:hover:text-red-400" title="Reset All Checklist Data">
                 <i class="fa-solid fa-arrow-rotate-left text-sm"></i>
@@ -215,13 +224,94 @@
         </section>
     </main>
 
+    <!-- Cloud Collaboration Config Modal -->
+    <div id="collabModal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-900 rounded-2xl max-w-lg w-full p-6 border border-slate-200 dark:border-slate-800 shadow-2xl relative">
+            <button onclick="closeCollabModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+            
+            <h2 class="text-lg font-bold text-slate-950 dark:text-white mb-2 flex items-center gap-2">
+                <i class="fa-solid fa-cloud text-brand-500"></i> Cloud Collaboration Hub
+            </h2>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mb-6">
+                Connect your checklist to a shared workspace. Colleagues on other devices can enter the same configuration to view, edit, and update the checklist in real time.
+            </p>
+
+            <div class="space-y-4">
+                <!-- Sync Mode selection -->
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Sync Mode</label>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button onclick="setCollabMode('demo')" id="modeBtnDemo" class="px-3 py-2.5 text-xs font-bold rounded-lg border text-center transition-all bg-brand-500/10 border-brand-500 text-brand-500">
+                            Instant Room (Free)
+                        </button>
+                        <button onclick="setCollabMode('firebase')" id="modeBtnFirebase" class="px-3 py-2.5 text-xs font-bold rounded-lg border text-center transition-all border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400">
+                            Enterprise Firebase
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Shared Room Parameters -->
+                <div id="collabSectionDemo" class="space-y-3">
+                    <div>
+                        <label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Collaboration Room Name / Key</label>
+                        <div class="flex gap-2">
+                            <input type="text" id="demoRoomKey" placeholder="e.g. corepay-launch-2026" class="flex-grow px-3 py-2 text-sm rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 focus:outline-none focus:border-brand-500">
+                            <button onclick="generateRandomRoomKey()" class="px-3 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-xs font-bold rounded-lg border border-slate-200 dark:border-slate-700 whitespace-nowrap">
+                                Generate ID
+                            </button>
+                        </div>
+                        <p class="text-[10px] text-slate-500 mt-1">
+                            Share this exact Room Key with your colleagues to let them access and sync edits.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Private Firebase Parameters -->
+                <div id="collabSectionFirebase" class="space-y-3 hidden">
+                    <p class="text-[10px] text-yellow-600 dark:text-yellow-500">
+                        Provide a standard secure Firebase Realtime Database config to save client records safely on your own server.
+                    </p>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-[10px] text-slate-400 mb-1">API Key</label>
+                            <input type="password" id="fbApiKey" class="w-full px-2.5 py-1.5 text-xs rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] text-slate-400 mb-1">Database URL</label>
+                            <input type="text" id="fbDbUrl" placeholder="https://....firebaseio.com" class="w-full px-2.5 py-1.5 text-xs rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] text-slate-400 mb-1">Project ID</label>
+                            <input type="text" id="fbProjectId" class="w-full px-2.5 py-1.5 text-xs rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] text-slate-400 mb-1">Session ID / Key</label>
+                            <input type="text" id="fbSessionId" placeholder="corepay-checklist" class="w-full px-2.5 py-1.5 text-xs rounded-lg bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 focus:outline-none">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-6 pt-4 border-t border-slate-200 dark:border-slate-800 flex gap-2 justify-end">
+                <button onclick="disconnectCloud()" class="px-3.5 py-2 text-xs font-bold border border-red-500/20 hover:bg-red-500/10 text-red-500 rounded-lg transition-all">
+                    Disconnect
+                </button>
+                <button onclick="saveCloudConfig()" class="px-4 py-2 text-xs font-extrabold bg-brand-500 hover:bg-brand-600 text-slate-950 rounded-lg transition-all">
+                    Connect & Sync
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Page Footer -->
     <footer class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 py-6 text-center text-xs text-slate-400 mt-12">
-        <p>© 2026 CorePay AI System Setup Companion. Complies with Global SOC2 Trust standards.</p>
+        <p>© 2026 CorePay AI. Complies with Global SOC2 Trust standards.</p>
     </footer>
 
     <script>
-        // Core Checklist Dataset re-indexed sequentially from 1 to 10
+        // Re-indexed sequential checklist items 1 to 10
         const rawChecklistData = [
             // 1. Payroll Module
             { id: 1, category: "1. Payroll Module", subCategory: "Employee Information", label: "Employee Master List", requirement: "Yes", status: "Pending", notes: "" },
@@ -346,7 +436,7 @@
             // 8. User Access & Security
             { id: 98, category: "8. User Access & Security", subCategory: "Settings", label: "System Users List", requirement: "Yes", status: "Pending", notes: "" },
             { id: 99, category: "8. User Access & Security", subCategory: "Settings", label: "User Roles Define", requirement: "Yes", status: "Pending", notes: "" },
-            { id: 105, category: "8. User Access & Security", subCategory: "Settings", label: "Approval Hierarchy Matrix", requirement: "Yes", status: "Pending", notes: "" },
+            { id: 100, category: "8. User Access & Security", subCategory: "Settings", label: "Approval Hierarchy Matrix", requirement: "Yes", status: "Pending", notes: "" },
             { id: 101, category: "8. User Access & Security", subCategory: "Settings", label: "Role Permissions Configuration", requirement: "Yes", status: "Pending", notes: "" },
             { id: 102, category: "8. User Access & Security", subCategory: "Settings", label: "Branch Access Requirements", requirement: "Yes", status: "Pending", notes: "" },
 
@@ -366,16 +456,9 @@
         ];
 
         let checklist = [];
-        let metadata = {
-            company: "",
-            contact: "",
-            email: "",
-            phone: "",
-            startDate: ""
-        };
+        let metadata = { company: "", contact: "", email: "", phone: "", startDate: "" };
         let activeModuleFilter = "ALL";
 
-        // Global list of unique module names sequentially sorted
         const modules = [
             "ALL",
             "1. Payroll Module",
@@ -390,13 +473,24 @@
             "10. Sign-Off"
         ];
 
-        // Retrieve saved database state or start fresh
+        // Cloud Sync parameters
+        let collabConfig = {
+            mode: 'demo', // 'demo' or 'firebase'
+            roomKey: '',
+            firebase: { apiKey: '', databaseURL: '', projectId: '', sessionId: '' }
+        };
+        let isCloudConnected = false;
+        let firebaseAppInstance = null;
+        let firebaseDbInstance = null;
+        let demoSyncInterval = null;
+        let localTimestamp = 0; // Track remote updates vs local mutations
+
+        // Load baseline state
         function loadState() {
             const savedChecklist = localStorage.getItem("corepay_checklist");
             const savedMetadata = localStorage.getItem("corepay_metadata");
+            const savedCollab = localStorage.getItem("corepay_collab_config");
 
-            // Ensure the cached copy has exactly 112 sequentially counted elements.
-            // If it doesn't match, we flush to prevent layout or index bugs.
             if (savedChecklist) {
                 const parsed = JSON.parse(savedChecklist);
                 if (parsed.length === 112 && parsed[0].id === 1) {
@@ -417,11 +511,29 @@
                 document.getElementById("metaPhone").value = metadata.phone || "";
                 document.getElementById("metaStartDate").value = metadata.startDate || "";
             }
+
+            if (savedCollab) {
+                collabConfig = JSON.parse(savedCollab);
+                // Populate inputs in config dialog
+                document.getElementById("demoRoomKey").value = collabConfig.roomKey || "";
+                document.getElementById("fbApiKey").value = collabConfig.firebase?.apiKey || "";
+                document.getElementById("fbDbUrl").value = collabConfig.firebase?.databaseURL || "";
+                document.getElementById("fbProjectId").value = collabConfig.firebase?.projectId || "";
+                document.getElementById("fbSessionId").value = collabConfig.firebase?.sessionId || "";
+                setCollabMode(collabConfig.mode);
+                
+                // If there was a previous connection established, attempt auto-reconnect
+                if (isCloudModeConfigured()) {
+                    initiateCloudConnection();
+                }
+            }
         }
 
-        // Write state directly back into persistent browser storage
         function saveState() {
             localStorage.setItem("corepay_checklist", JSON.stringify(checklist));
+            if (isCloudConnected) {
+                pushStateToCloud();
+            }
         }
 
         function saveMetadata() {
@@ -431,8 +543,11 @@
             metadata.phone = document.getElementById("metaPhone").value;
             metadata.startDate = document.getElementById("metaStartDate").value;
             localStorage.setItem("corepay_metadata", JSON.stringify(metadata));
+
+            if (isCloudConnected) {
+                pushStateToCloud();
+            }
             
-            // Show auto-saved small text indicator
             const notif = document.getElementById("saveNotification");
             notif.innerText = "⚡ Autosaving...";
             notif.classList.remove("hidden");
@@ -445,7 +560,6 @@
             saveMetadata();
             showToast("Client details successfully saved!");
             
-            // Visual bounce for the notification
             const notif = document.getElementById("saveNotification");
             notif.classList.remove("hidden");
             notif.classList.add("text-brand-500");
@@ -476,13 +590,242 @@
             }
         }
 
-        // Render left hand sidebar filters dynamically
+        // Collaboration Controller Logic
+        function openCollabModal() {
+            document.getElementById("collabModal").classList.remove("hidden");
+        }
+
+        function closeCollabModal() {
+            document.getElementById("collabModal").classList.add("hidden");
+        }
+
+        function setCollabMode(mode) {
+            collabConfig.mode = mode;
+            const btnDemo = document.getElementById("modeBtnDemo");
+            const btnFb = document.getElementById("modeBtnFirebase");
+            const secDemo = document.getElementById("collabSectionDemo");
+            const secFb = document.getElementById("collabSectionFirebase");
+
+            if (mode === 'demo') {
+                btnDemo.className = "px-3 py-2.5 text-xs font-bold rounded-lg border text-center transition-all bg-brand-500/10 border-brand-500 text-brand-500";
+                btnFb.className = "px-3 py-2.5 text-xs font-bold rounded-lg border text-center transition-all border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400";
+                secDemo.classList.remove("hidden");
+                secFb.classList.add("hidden");
+            } else {
+                btnFb.className = "px-3 py-2.5 text-xs font-bold rounded-lg border text-center transition-all bg-brand-500/10 border-brand-500 text-brand-500";
+                btnDemo.className = "px-3 py-2.5 text-xs font-bold rounded-lg border text-center transition-all border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400";
+                secFb.classList.remove("hidden");
+                secDemo.classList.add("hidden");
+            }
+        }
+
+        function generateRandomRoomKey() {
+            const rand = "corepay-room-" + Math.floor(1000 + Math.random() * 9000);
+            document.getElementById("demoRoomKey").value = rand;
+        }
+
+        function isCloudModeConfigured() {
+            if (collabConfig.mode === 'demo' && collabConfig.roomKey) return true;
+            if (collabConfig.mode === 'firebase' && collabConfig.firebase?.databaseURL && collabConfig.firebase?.sessionId) return true;
+            return false;
+        }
+
+        function disconnectCloud() {
+            localStorage.removeItem("corepay_collab_config");
+            collabConfig.roomKey = '';
+            if (demoSyncInterval) {
+                clearInterval(demoSyncInterval);
+                demoSyncInterval = null;
+            }
+            isCloudConnected = false;
+            updateCloudStatusUI();
+            showToast("Disconnected from Cloud Collaboration!");
+            closeCollabModal();
+        }
+
+        function saveCloudConfig() {
+            // Read UI states
+            collabConfig.roomKey = document.getElementById("demoRoomKey").value.trim();
+            collabConfig.firebase = {
+                apiKey: document.getElementById("fbApiKey").value.trim(),
+                databaseURL: document.getElementById("fbDbUrl").value.trim(),
+                projectId: document.getElementById("fbProjectId").value.trim(),
+                sessionId: document.getElementById("fbSessionId").value.trim()
+            };
+
+            if (collabConfig.mode === 'demo' && !collabConfig.roomKey) {
+                alert("Please enter or generate a Room Name to connect!");
+                return;
+            }
+            if (collabConfig.mode === 'firebase' && (!collabConfig.firebase.databaseURL || !collabConfig.firebase.sessionId)) {
+                alert("Please enter a valid Database URL and Session ID for Firebase!");
+                return;
+            }
+
+            localStorage.setItem("corepay_collab_config", JSON.stringify(collabConfig));
+            initiateCloudConnection();
+            closeCollabModal();
+        }
+
+        // Setup real-time listeners or polling sync blocks
+        function initiateCloudConnection() {
+            if (demoSyncInterval) {
+                clearInterval(demoSyncInterval);
+                demoSyncInterval = null;
+            }
+
+            if (collabConfig.mode === 'demo') {
+                isCloudConnected = true;
+                updateCloudStatusUI();
+                showToast("Connected to Collaboration Room: " + collabConfig.roomKey);
+                
+                // Fetch first to merge changes, then start sync loop
+                pullStateFromCloud();
+                demoSyncInterval = setInterval(pullStateFromCloud, 4000);
+            } 
+            else if (collabConfig.mode === 'firebase') {
+                try {
+                    // Initialize or use active Firebase Compat instance safely
+                    const config = {
+                        apiKey: collabConfig.firebase.apiKey,
+                        databaseURL: collabConfig.firebase.databaseURL,
+                        projectId: collabConfig.firebase.projectId
+                    };
+                    
+                    if (firebase.apps.length === 0) {
+                        firebaseAppInstance = firebase.initializeApp(config);
+                    } else {
+                        firebaseAppInstance = firebase.app();
+                    }
+
+                    firebaseDbInstance = firebaseAppInstance.database();
+                    const path = 'checklists/' + (collabConfig.firebase.sessionId || 'default');
+
+                    // Register listener to merge incoming real-time edits
+                    firebaseDbInstance.ref(path).on('value', (snapshot) => {
+                        const cloudData = snapshot.val();
+                        if (cloudData) {
+                            // Check timestamps to avoid recursive loopbacks
+                            if (cloudData.timestamp > localTimestamp) {
+                                if (cloudData.checklist) checklist = cloudData.checklist;
+                                if (cloudData.metadata) {
+                                    metadata = cloudData.metadata;
+                                    syncMetadataInputs();
+                                }
+                                localTimestamp = cloudData.timestamp;
+                                localStorage.setItem("corepay_checklist", JSON.stringify(checklist));
+                                localStorage.setItem("corepay_metadata", JSON.stringify(metadata));
+                                renderFilters();
+                                renderChecklist();
+                                updateCalculatedMetrics();
+                            }
+                        } else {
+                            // First run on this path: populate the blank remote record
+                            pushStateToCloud();
+                        }
+                    });
+
+                    isCloudConnected = true;
+                    updateCloudStatusUI();
+                    showToast("Connected to Firebase Real-time Database!");
+
+                } catch (e) {
+                    console.error("Firebase config error:", e);
+                    showToast("Firebase connection failed: Check configuration details.");
+                    isCloudConnected = false;
+                    updateCloudStatusUI();
+                }
+            }
+        }
+
+        // Pushes both checklist array and metadata config fields
+        function pushStateToCloud() {
+            localTimestamp = Date.now();
+            const payload = {
+                timestamp: localTimestamp,
+                checklist: checklist,
+                metadata: metadata
+            };
+
+            if (collabConfig.mode === 'demo') {
+                // Free, zero-setup KVDB store using custom public routing keys
+                const bucketUrl = "https://kvdb.io/Mz9W4vWf6tW7z6Y8u3Z1m9/" + encodeURIComponent(collabConfig.roomKey);
+                fetch(bucketUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                }).catch(e => console.error("Cloud push failed:", e));
+            } 
+            else if (collabConfig.mode === 'firebase' && firebaseDbInstance) {
+                const path = 'checklists/' + collabConfig.firebase.sessionId;
+                firebaseDbInstance.ref(path).set(payload).catch(e => console.error("Firebase write failed:", e));
+            }
+        }
+
+        // Pulls state dynamically from the open public KVDB store
+        function pullStateFromCloud() {
+            if (!isCloudConnected || collabConfig.mode !== 'demo') return;
+            const bucketUrl = "https://kvdb.io/Mz9W4vWf6tW7z6Y8u3Z1m9/" + encodeURIComponent(collabConfig.roomKey);
+
+            fetch(bucketUrl)
+                .then(r => {
+                    if (r.status === 404) {
+                        // Room does not exist yet: initialize the room's data bucket
+                        pushStateToCloud();
+                        return null;
+                    }
+                    return r.json();
+                })
+                .then(cloudData => {
+                    if (cloudData && cloudData.timestamp > localTimestamp) {
+                        if (cloudData.checklist) checklist = cloudData.checklist;
+                        if (cloudData.metadata) {
+                            metadata = cloudData.metadata;
+                            syncMetadataInputs();
+                        }
+                        localTimestamp = cloudData.timestamp;
+                        localStorage.setItem("corepay_checklist", JSON.stringify(checklist));
+                        localStorage.setItem("corepay_metadata", JSON.stringify(metadata));
+                        renderFilters();
+                        renderChecklist();
+                        updateCalculatedMetrics();
+                    }
+                })
+                .catch(e => console.error("Cloud fetch sync failure:", e));
+        }
+
+        function syncMetadataInputs() {
+            document.getElementById("metaCompany").value = metadata.company || "";
+            document.getElementById("metaContact").value = metadata.contact || "";
+            document.getElementById("metaEmail").value = metadata.email || "";
+            document.getElementById("metaPhone").value = metadata.phone || "";
+            if (metadata.startDate) {
+                document.getElementById("metaStartDate").value = metadata.startDate;
+            }
+        }
+
+        function updateCloudStatusUI() {
+            const btn = document.getElementById("cloudStatusBtn");
+            const icon = document.getElementById("cloudIcon");
+            const txt = document.getElementById("cloudStatusText");
+
+            if (isCloudConnected) {
+                btn.className = "px-3.5 py-2 rounded-lg text-xs font-bold transition-all border flex items-center gap-2 outline-none shadow-sm bg-emerald-500/15 border-emerald-500 text-emerald-500 animate-pulse";
+                icon.className = "fa-solid fa-cloud";
+                txt.innerText = collabConfig.mode === 'demo' ? "Demo Syncing: " + collabConfig.roomKey : "Real-time Sync Active";
+            } else {
+                btn.className = "px-3.5 py-2 rounded-lg text-xs font-bold transition-all border flex items-center gap-2 outline-none shadow-sm bg-slate-100 dark:bg-slate-850 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-500 border-slate-200 dark:border-slate-800";
+                icon.className = "fa-solid fa-cloud-arrow-up";
+                txt.innerText = "Local Storage Only";
+            }
+        }
+
+        // Render filters
         function renderFilters() {
             const container = document.getElementById("moduleFilterList");
             container.innerHTML = "";
 
             modules.forEach(mod => {
-                // Calculate outstanding count per module
                 const count = mod === "ALL" 
                     ? checklist.length 
                     : checklist.filter(item => item.category === mod).length;
@@ -515,7 +858,7 @@
             });
         }
 
-        // Render table checklist content dynamically
+        // Render table list
         function renderChecklist() {
             const tbody = document.getElementById("checklistBody");
             const empty = document.getElementById("emptyState");
@@ -524,7 +867,6 @@
             const searchQuery = document.getElementById("checklistSearch").value.toLowerCase();
             const statusFilter = document.getElementById("statusFilter").value;
 
-            // Apply filter chain
             let filtered = checklist;
 
             if (activeModuleFilter !== "ALL") {
@@ -551,7 +893,6 @@
                 empty.classList.remove("flex");
             }
 
-            // Group table visually if active module filter is 'ALL'
             let currentGroup = "";
 
             filtered.forEach(item => {
@@ -571,12 +912,6 @@
                 row.className = `hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-all ${
                     item.status === 'Completed' ? 'opacity-85 dark:opacity-70 bg-slate-50/30 dark:bg-slate-900/10' : ''
                 }`;
-
-                // Status styling helpers
-                let badgeStyle = "bg-slate-100 text-slate-700 dark:bg-slate-850 dark:text-slate-300";
-                if (item.status === "Completed") badgeStyle = "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20";
-                if (item.status === "In Progress") badgeStyle = "bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-500/20";
-                if (item.status === "N/A") badgeStyle = "bg-slate-200/50 text-slate-500 dark:bg-slate-800/50 dark:text-slate-500";
 
                 row.innerHTML = `
                     <td class="p-4 text-center">
@@ -614,7 +949,7 @@
             });
         }
 
-        // Toggle Completed helper
+        // Toggle helpers
         function toggleCompleted(id) {
             const index = checklist.findIndex(i => i.id === id);
             if (index !== -1) {
@@ -626,7 +961,6 @@
             }
         }
 
-        // Dropdown status updates
         function updateStatus(id, value) {
             const index = checklist.findIndex(i => i.id === id);
             if (index !== -1) {
@@ -638,7 +972,6 @@
             }
         }
 
-        // Custom Notes input syncing
         function updateNotes(id, value) {
             const index = checklist.findIndex(i => i.id === id);
             if (index !== -1) {
@@ -647,7 +980,6 @@
             }
         }
 
-        // Live calculation and metric updates
         function updateCalculatedMetrics() {
             const total = checklist.length;
             const completed = checklist.filter(item => item.status === "Completed").length;
@@ -659,12 +991,11 @@
             document.getElementById("metricProgressBar").style.width = `${percent}%`;
         }
 
-        // Filter triggers
         function filterChecklist() {
             renderChecklist();
         }
 
-        // Theme Toggle Controller
+        // Theme Controller
         function toggleTheme() {
             const html = document.documentElement;
             if (html.classList.contains('dark')) {
@@ -678,10 +1009,8 @@
             }
         }
 
-        // Toast Messages
+        // Custom Toasts
         function showToast(message) {
-            const toast = document.getElementById('toast');
-            // If toast container is not in original DOM, create it
             let toastEl = document.getElementById('toastElement');
             if (!toastEl) {
                 toastEl = document.createElement('div');
@@ -698,9 +1027,7 @@
             }, 3000);
         }
 
-        // Initialize state on window load
         window.onload = function() {
-            // Check theme settings
             const savedTheme = localStorage.getItem('theme') || 'dark';
             if (savedTheme === 'dark') {
                 document.documentElement.classList.add('dark');
@@ -712,6 +1039,7 @@
             renderFilters();
             renderChecklist();
             updateCalculatedMetrics();
+            updateCloudStatusUI();
         }
     </script>
 </body>
